@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}About - AI Music Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h2 class="mb-0"><i class="fas fa-info-circle"></i> About AI Music Generator</h2>
+            </div>
+            
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4><i class="fas fa-robot"></i> How It Works</h4>
+                        <p>This AI music generator uses a deep learning LSTM (Long Short-Term Memory) neural network 
+                           trained on classical music patterns to compose original melodies.</p>
+                        
+                        <h5>Technology Stack:</h5>
+                        <ul>
+                            <li><strong>Deep Learning:</strong> TensorFlow & Keras</li>
+                            <li><strong>Music Processing:</strong> Music21 library</li>
+                            <li><strong>Web Interface:</strong> Flask & Bootstrap</li>
+                            <li><strong>Audio Conversion:</strong> FluidSynth</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {% if metadata %}
+                        <h4><i class="fas fa-chart-bar"></i> Model Statistics</h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>Training Accuracy:</th>
+                                    <td>{{ "%.1f" | format(metadata.training_info.validation_accuracy * 100) }}%</td>
+                                </tr>
+                                <tr>
+                                    <th>Model Parameters:</th>
+                                    <td>{{ "{:,}".format(metadata.model_architecture.parameters) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Vocabulary Size:</th>
+                                    <td>{{ metadata.vocab_size }} unique elements</td>
+                                </tr>
+                                <tr>
+                                    <th>Sequence Length:</th>
+                                    <td>{{ metadata.sequence_length }} notes</td>
+                                </tr>
+                                <tr>
+                                    <th>Training Dataset:</th>
+                                    <td>{{ metadata.training_info.dataset_size }} musical notes</td>
+                                </tr>
+                                <tr>
+                                    <th>Epochs Trained:</th>
+                                    <td>{{ metadata.training_info.epochs_trained }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h4><i class="fas fa-sliders-h"></i> Parameter Guide</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>Number of Notes</h6>
+                        <p class="small">Controls the length of your composition. More notes = longer melody.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Creativity Level</h6>
+                        <p class="small">Lower values follow training patterns closely. Higher values are more experimental.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Tempo</h6>
+                        <p class="small">Beats per minute. Affects playback speed of your composition.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
