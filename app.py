@@ -10,19 +10,20 @@ import tensorflow as tf
 from music21 import stream, note, tempo, meter, key
 import tempfile
 import uuid
-import pygame
+# import pygame  # Removed as pygame.mixer.init() is no longer used
 import wave
 
 app = Flask(__name__)
 
 # Initialize pygame mixer for audio playback
-# Note: pygame.mixer might cause issues in serverless/container environments
-# where audio hardware isn't directly available or X server is missing.
-# If you encounter issues, consider removing or conditionally initializing this.
-try:
-    pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=1024)
-except Exception as e:
-    print(f"Warning: Could not initialize pygame mixer. Audio playback features might be limited. Error: {e}")
+# This entire block is commented out because it causes errors in headless server environments
+# where audio hardware isn't directly available.
+# The application generates WAV files, which are played on the client-side browser,
+# so server-side audio playback is not required.
+# try:
+#     pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=1024)
+# except Exception as e:
+#     print(f"Warning: Could not initialize pygame mixer. Audio playback features might be limited. Error: {e}")
 
 # Load model and mappings on startup
 MODEL_PATH = 'models/ai_music_model.keras'
