@@ -10,27 +10,18 @@ import tensorflow as tf
 from music21 import stream, note, tempo, meter, key
 import tempfile
 import uuid
-# import pygame  # Removed as pygame.mixer.init() is no longer used
+
 import wave
 
 app = Flask(__name__)
 
-# Initialize pygame mixer for audio playback
-# This entire block is commented out because it causes errors in headless server environments
-# where audio hardware isn't directly available.
-# The application generates WAV files, which are played on the client-side browser,
-# so server-side audio playback is not required.
-# try:
-#     pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=1024)
-# except Exception as e:
-#     print(f"Warning: Could not initialize pygame mixer. Audio playback features might be limited. Error: {e}")
 
 # Load model and mappings on startup
 MODEL_PATH = 'models/ai_music_model.keras'
 MAPPINGS_PATH = 'models/note_mappings.pkl'
 METADATA_PATH = 'models/model_metadata.json'
 
-# Global variables
+
 model = None
 note_mappings = None
 metadata = None
@@ -64,12 +55,10 @@ def generate_music_sequence(num_notes=100, temperature=1.0, seed=None):
     sequence_length = note_mappings['sequence_length']
     vocab_size = len(int_to_note)
     
-    # Set random seed for reproducibility if provided
     if seed:
         random.seed(seed)
         np.random.seed(seed)
-    
-    # Initialize sequence
+
     current_sequence = [random.randint(0, vocab_size - 1) for _ in range(sequence_length)]
     generated_notes = []
     
@@ -159,12 +148,12 @@ def create_browser_compatible_audio(notes, output_path, tempo_bpm=120):
         note_duration = 60.0 / tempo_bpm   # Duration per beat
         
         audio_data = []
-        for i, note_name in enumerate(notes[:60]):   # Limit to prevent long processing
+        for i, note_name in enumerate(notes[:60]):   
             if note_name in note_frequencies:
                 freq = note_frequencies[note_name]
                 t = np.linspace(0, note_duration, int(sample_rate * note_duration))
                 
-                # Create a more musical envelope (attack, decay, sustain, release)
+               
                 envelope = np.ones_like(t)
                 attack_samples = int(0.1 * len(t))
                 release_samples = int(0.1 * len(t))
@@ -190,8 +179,8 @@ def create_browser_compatible_audio(notes, output_path, tempo_bpm=120):
             
             # Save as WAV file
             with wave.open(output_path, 'w') as wav_file:
-                wav_file.setnchannels(1)   # Mono
-                wav_file.setsampwidth(2)   # 2 bytes per sample
+                wav_file.setnchannels(1)   
+                wav_file.setsampwidth(2)   
                 wav_file.setframerate(sample_rate)
                 wav_file.writeframes(audio_array.tobytes())
             
@@ -211,21 +200,19 @@ def index():
 def generate_music():
     """Generate AI music"""
     try:
-        # Get parameters from request
+        
         data = request.json
         num_notes = int(data.get('num_notes', 80))
         temperature = float(data.get('temperature', 1.0))
         tempo = int(data.get('tempo', 120))
         seed = data.get('seed', None)
         
-        # Convert seed to int if provided
         if seed and str(seed).strip():
             try:
                 seed = int(seed)
             except ValueError:
                 seed = None
         
-        # Validate parameters
         num_notes = max(20, min(200, num_notes))
         temperature = max(0.1, min(2.0, temperature))
         tempo = max(60, min(200, tempo))
@@ -236,12 +223,12 @@ def generate_music():
         if generated_notes is None or len(generated_notes) == 0:
             return jsonify({'error': 'Failed to generate music - no notes produced'}), 500
         
-        # Create unique filename
+  
         unique_id = str(uuid.uuid4())[:8]
         midi_filename = f'generated_music_{unique_id}.mid'
         audio_filename = f'generated_music_{unique_id}.wav'
         
-        # Create static directory if it doesn't exist
+
         os.makedirs('static', exist_ok=True)
         
         midi_path = os.path.join('static', midi_filename)
@@ -289,10 +276,9 @@ def about():
 if __name__ == '__main__':
     # Load model on startup
     if load_ai_model():
-        # Get the port from the environment variable, default to 5000 if not set
-        # Railway injects the PORT environment variable
+      
         port = int(os.environ.get('PORT', 5000))
-        # Disable debug mode for production deployments
+     
         app.run(debug=False, host='0.0.0.0', port=port)
     else:
         print("Failed to load AI model. Please check model files.")
